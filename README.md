@@ -4,14 +4,14 @@
 
 *Writing*
 
-|                              |     |     |
-|------------------------------|-----|-----|
-| Abstract (200 words)         | 5   |     |
-| Introduction (400-500 words) | 5   |     |
-| Methods (500 words)          | 5   |     |
-| Results (500 words)          | 5   |     |
-| Discussion (700 words)       | 5   |     |
-| References                   | 5   |     |
+|                                                |     |                     |
+|------------------------------------------------|-----|---------------------|
+| Abstract (200 words)                           | 5   | Febe, Ramtin, James |
+| Introduction (400-500 words) / Mini Lit Review | 5   | Febe, Ramtin        |
+| Methods (500 words)                            | 5   | Febe                |
+| Results (500 words)                            | 5   | Febe, Ramtin, James |
+| Discussion (700 words)                         | 5   | James               |
+| References                                     | 5   | Ramtin, James       |
 
 *Code*
 
