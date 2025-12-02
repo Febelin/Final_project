@@ -353,7 +353,7 @@ skim(students) # For a quick check.
 
 Now we can run inferential tests with mental health as the IV, region as the grouping, and conflicts over social media as the DV.
 
-```{r}
+```{r, echo=TRUE, results='hide'}
 # Center mental health.
 students <- students |>
   mutate(mh_c = scale(mental_health_score, center = TRUE, scale = FALSE))
@@ -362,6 +362,7 @@ students <- students |>
 model_int <- lm(conflicts_over_social_media ~ mh_c * region, data = students)
 summary(model_int)
 
+options(show.signif.stars = FALSE)
 anova(model_int)
 
 # Correlation by region.
