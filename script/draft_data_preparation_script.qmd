@@ -26,6 +26,7 @@ library(tidylog)
 library(janitor)
 library(skimr)
 library(knitr)
+library(kableExtra)
 ```
 
 # Load the data set
@@ -177,7 +178,7 @@ The post hoc Tukey tests confirmed significant differences across all usage grou
 
 *RQ*~3~: How does primary usage of a specific social media platform impact mental health?
 
-*H*~4~: Meta-affiliated platforms, such as Facebook and Instagram, will result in a greater impact to mental health compared to other platforms.
+*H*~4~: Meta-affiliated platforms, such as Facebook and Instagram, will result in a greater negative impact to mental health compared to other platforms.
 
 ```{r}
 #| include: false
@@ -201,7 +202,7 @@ platform_mental_health <- platform_use |>
     mean_pmh = mean(Mental_Health_Score, na.rm = TRUE),
     sd_pmh = sd(Mental_Health_Score, na.rm = TRUE)
   ) |> 
-  arrange(mean_pmh) |> 
+  arrange(desc(mean_pmh)) |> 
   rename(
     `Most Used Platform` = Most_Used_Platform,
     Mean = mean_pmh,
@@ -212,7 +213,10 @@ platform_mental_health |>
   kable(
     caption = "Mean Mental Health Scores by Platform",
     digits = 2
-  )
+  ) |> 
+  kable_styling(full_width = FALSE) |> 
+  row_spec(5, bold = TRUE) |> 
+  row_spec(8, bold = TRUE)
 ```
 
 Based on the results in this table, we cannot definitively correlate the use of Meta-owned platforms to lower self-reported mental health scores. *H*~4~ is not supported.
@@ -257,7 +261,8 @@ mh_wide <- mh_wide |>
     Total = total,
     `Low (%)` = pct_low,
     `Not Low (%)` = pct_not_low
-  )
+  ) |> 
+  arrange(desc(`Low (%)`))
 
 mh_wide |>
   select(-Low, -`Not Low`, -Total) |> 
