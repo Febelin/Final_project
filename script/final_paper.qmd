@@ -164,7 +164,7 @@ female_data <- group_data |>
 
 As we mentioned before, three groups were divided by their screen use time, and the figure 4 does show a negative effect of daily screen time on mental health, but there is no clear "tipping point." Instead, the decline appears more stepwise, with mental health decreasing gradually across each usage group, which means $H_2$ was not supported.
 
-The most interesting finding is that the downward trend is evident for both genders, but the decline is notably steeper among female students, especially in the high-usage category, suggesting that excessive screen exposure may have a stronger negative impact on females' psychological well-being. Therefore, $H_3$ was supported.
+The most interesting finding is that the downward trend is evident for both genders, but the decline is notably steeper among female students, especially in the high-usage category, suggesting that excessive screen exposure may have a stronger negative impact on females' psychological well-being.
 
 ```{r}
 summary_data <- group_data |>
@@ -222,7 +222,7 @@ p_f_all <- tukey_female_res$Usage_Group[, "p adj"]
 
 To statistically verify the patterns observed in the plot, we conducted separate one-way ANOVAs for male and female students. Also, we conducted Tukey HSD post-hoc analysis. The results show that significant declines across all usage levels for both male(all ps \<.001) and female(all ps \<.001). For male students, mental health scores dropped by `r round(abs(diff_m_mod_low),2)` points from the Low to Moderate group, and by another `r round(abs(diff_m_high_mod),2)` points from the Moderate to High group.
 
-In contrast, female students showed an accelerating decline. While the drop from Low to Moderate usage was `r round(abs(diff_f_mod_low),2)` points, the decline became much steeper, dropping by `r round(abs(diff_f_high_mod),2)` points, when moving from Moderate to High usage. This indicates that excessive screen time (\>5h) may have a more severe marginal impact on female students.
+In contrast, female students showed an accelerating decline. While the drop from Low to Moderate usage was `r round(abs(diff_f_mod_low),2)` points, the decline became much steeper, dropping by `r round(abs(diff_f_high_mod),2)` points, when moving from Moderate to High usage. This indicates that excessive screen time (\>5h) may have a more severe marginal impact on female students.Therefore, $H_3$ was supported.
 
 ## Discussion
 
