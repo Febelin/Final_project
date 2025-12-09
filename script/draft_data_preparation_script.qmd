@@ -216,7 +216,8 @@ platform_mental_health |>
   ) |> 
   kable_styling(full_width = FALSE) |> 
   row_spec(5, bold = TRUE) |> 
-  row_spec(8, bold = TRUE)
+  row_spec(8, bold = TRUE) |> 
+  row_spec(12, bold = TRUE)
 ```
 
 Based on the results in this table, we cannot definitively correlate the use of Meta-owned platforms to lower self-reported mental health scores. *H*~4~ is not supported.
