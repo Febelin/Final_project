@@ -19,13 +19,13 @@ editor: visual
 
 ## Abstract
 
-This study examines the relationship between social media usage, sleep duration, digital platform selection and mental health among a sample of students from various global regions. The study tested a mediation hypothesis that sleep deprivation mediates the negative relationship between daily screen usage and mental health scores. Our result support a partial mediation model, indicating that while sleep duration plays a role, it does not fully account for the effect of screen usage on mental health. We further explored the "tipping point" of screen usage, finding that the nagative trend is stepwise; this suggests there is no comparatively 'safe zone' for screen usage. Additionally, the pattern differ by gender, impacting female students more significantly than male students. Findings also suggested that there are significant differences between primary digital platform usage and reported mental health scores.
-
-***note: Please add Ramtin's conclusion***
+This study examines the relationship between social media usage, sleep duration, digital platform selection and mental health among a sample of students from various global regions. The study tested a mediation hypothesis that sleep deprivation mediates the negative relationship between daily screen usage and mental health scores. Our result support a partial mediation model, indicating that while sleep duration plays a role, it does not fully account for the effect of screen usage on mental health. We further explored the "tipping point" of screen usage, finding that the negative trend is stepwise; this suggests there is no comparatively 'safe zone' for screen usage. Additionally, the pattern differs by gender, impacting female students more significantly than male students. Findings also suggested that there are significant differences between primary digital platform usage and reported mental health scores. Finally, students in the Far East tended to report better mental health and fewer social media conflicts than those in the Middle East, with students in the United States (US) reporting the most conflict. Across all regions, poorer mental health was linked to greater social media conflict, and this link was noticeably stronger outside the United States.
 
 ## Introduction
 
-The pervasive integration of social media platforms into daily lives of students has raised significant concerns regarding its impact on academic performance, psychological health, and interpersonal relationships[@barthorpe2020social; @neophytou2021effects; @naslund2020social]. This study aims to empirically test these relationships among social media habits, sleeping duration, digital platform selection and self-reported mental health, by using a dataset from Kaggle[@kaggle_dataset].
+The existing literature shows that daily screen time of two hours or more is consistently associated with lower psychological well-being, including higher depressive and anxiety symptoms, poorer environmental mastery, and reduced personal growth [@twe-cam; @bas-etal; @alv-etal; @sti-vin ]. At the same time, studies point out that moderate use does not appear harmful and that benefits emerge when screen time is replaced with physical activity, although some scholars warn that effects depend on the context and the type of digital activity [@twe-cam; @bas-etal; @pon].
+
+The pervasive integration of social media platforms into the daily lives of students has raised significant concerns regarding its impact on academic performance, psychological health, and interpersonal relationships[@barthorpe2020social; @neophytou2021effects; @naslund2020social]. This study aims to empirically test these relationships among social media habits, sleeping duration, digital platform selection and self-reported mental health, by using a dataset from Kaggle[@kaggle_dataset].
 
 The first research question asks whether sleep deprivation acts as a mediator between screen time and mental health ($RQ_1$). We hypothesized that increased screen time would negatively predict sleep duration, which in turn would degrade mental health scores ($H_1$).
 
@@ -143,7 +143,7 @@ Finally, in Model c', when both screen usage and sleep duration were included, s
 
 This reduction in the coefficient suggests that sleep duration partially mediates the negative impact of screen time on mental health.
 
-***RQ***~**2**~**:Is there a critical 'tipping point' in screen usage where sleep duration and mental health exhibit a sharp decline?**
+***RQ***~**2**~**: Is there a critical 'tipping point' in screen usage where sleep duration and mental health exhibit a sharp decline?**
 
 -   ***H***~**2**~**: Students exceeding a threshold of 5 hours per day will report significantly worse outcomes compared to low-usage groups, whereas the difference between low (0\~3) and moderate usage (3\~5)may be minimal.**
 -   ***H***~**3**~**: However, this pattern may vary by gender, and the differences in outcomes may not be the same across male and female students.**
@@ -396,9 +396,120 @@ The resulting data indicated that those who reported using WhatsApp or Snapchat 
 
 Similar to $H_4$, $H_5$ was partially supported by these findings, with WhatsApp's prioritized usage having the highest level of reported social media addiction and Instagram not far behind; Facebook, in contrast, reported a near-average level of social media addiction (*M* = `r round(platform_addiction[["Mean"]][ platform_addiction[["Most Used Platform"]] == "Facebook" ], 2)`, *SD* = `r round(platform_addiction[["Standard Deviation"]][ platform_addiction[["Most Used Platform"]] == "Facebook" ], 2)`).
 
-### Region
+### Regions
 
-(for Ramtin's results)
+For the last RQ, we wanted to use a geographical lens to compare the US with two regions in Asia and discover the differences in how mental health affects conflicts over social media.
+
+***RQ***~**6**~**: Among college students, comparing students from the US to those from the Middle East and the Far East, how does mental health affect conflicts over social media?**
+
+For this question, we are filtering the responses into three groups by country: the USA, the Middle East, and the Far East, with each group representing one of the three authors. We are also exclusively looking at college students, both undergrad and grad, thereby removing high-schoolers, to be representative of the authors once again.
+
+```{r}
+sm <- import(here("data", "tidy_data.csv")) |>
+  clean_names()
+  
+middle_east <- c("Bahrain", "Iraq", "Israel", "Jordan", "Kuwait",
+                 "Lebanon", "Oman", "Qatar", "Syria", "Turkey",
+                 "UAE", "Yemen")
+
+far_east <- c("China", "Japan", "South Korea", "Taiwan", "Singapore",
+              "Malaysia", "Indonesia", "Vietnam", "Philippines",
+              "Thailand", "Hong Kong")
+
+# Use the right column and classifications to filter for college students.
+# Create a new column for our three regions.
+students <- sm |>
+  filter(academic_level %in% c("Undergraduate", "Graduate")) |>
+  mutate(
+    region = case_when(
+      country == "USA" ~ "USA",
+      country %in% middle_east ~ "Middle East",
+      country %in% far_east ~ "Far East",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(region)) |> # Select the columns to use.
+  select(student_id,
+         region,
+         academic_level,
+         age,
+         gender,
+         mental_health_score,
+         
+         conflicts_over_social_media)
+
+skim(students) # For a quick check.
+```
+
+Now we can run inferential tests with mental health as the IV, region as the grouping, and conflicts over social media as the DV.
+
+```{r, echo=TRUE, results='hide'}
+# Center mental health.
+students <- students |>
+  mutate(mh_c = scale(mental_health_score, center = TRUE, scale = FALSE))
+
+# Interaction model for differences by region.
+model_int <- lm(conflicts_over_social_media ~ mh_c * region, data = students)
+summary(model_int)
+
+options(show.signif.stars = FALSE)
+anova(model_int)
+
+# Correlation by region.
+cor_by_region <- students |>
+  group_by(region) |>
+  summarise(
+    n = n(),
+    r_mh_conflict = cor(mental_health_score,
+                        conflicts_over_social_media,
+                        use = "pairwise.complete.obs")
+  )
+
+kable(cor_by_region, digits = 3,
+      caption = "Correlation Between Mental Health and Social Media Conflicts by Region")
+
+# Few basic descriptive statistics.
+desc_table <- students |>
+  group_by(region) |>
+  summarise(
+    n = n(),
+    mean_mh = mean(mental_health_score, na.rm = TRUE),
+    sd_mh   = sd(mental_health_score, na.rm = TRUE),
+    mean_conflict = mean(conflicts_over_social_media, na.rm = TRUE),
+    sd_conflict   = sd(conflicts_over_social_media, na.rm = TRUE)
+  )
+```
+
+With a multiple regression model that included centered mental health scores, three regions, and their interaction, the descriptive statistics show that students from the Far East reported the highest mental health scores (M = 6.77, SD = 0.91) and the lowest social media conflict levels (M = 2.30, SD = 0.86), followed by students from the Middle East next (M = 5.71, SD = 0.75; M = 3.27, SD = 0.81, respectively) and the United States last (M = 4.90, SD = 0.71; M = 3.80, SD = 0.41). Mental health was strongly and negatively associated with social media conflict across the board, and the relationship varied by the region, with the strongest correlations observed in the Middle East (r = −.98), followed by the Far East (r = −.90) and the United States (r = −.79). It was also revealed that the strength of this association was significantly different across regions, which suggest that poorer mental health predicts higher levels of conflictover social media more strongly in the Middle East and the Far East in comparison to students in the US.
+
+```{r}
+ggplot(students,
+       aes(x = mental_health_score,
+           y = conflicts_over_social_media,
+           color = region)) +
+  geom_jitter(width = 0.1, height = 0.1, alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE, size = 1.1) +
+  labs(
+    title = "Mental Health and Conflicts Over Social Media by Region",
+    x = "Mental Health Score",
+    y = "Conflicts Over Social Media",
+    color = "Region"
+  ) +
+  theme_minimal()
+
+students |>
+  group_by(region) |>
+  summarise(mean_conflict = mean(conflicts_over_social_media, na.rm = TRUE)) %>%
+  ggplot(aes(x = region, y = mean_conflict, fill = region)) +
+  geom_col() +
+  labs(
+    title = "Average Social Media Conflicts by Region for College Students",
+    x = "Region",
+    y = "Mean Conflict Score"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
 
 ## Discussion
 
@@ -406,6 +517,6 @@ Similar to $H_4$, $H_5$ was partially supported by these findings, with WhatsApp
 
 (Febe's limitations, if any.)
 
-(Ramtin's limitations, if any.)
+Ramtin's limitations: The data could have been more representative by including more countries and more responses from such countries; however, politics.
 
 ## References
